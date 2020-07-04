@@ -19,6 +19,8 @@
     "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=dp-service --format=\"{{.ID}}\"))"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",

@@ -1,0 +1,21 @@
+{
+  "eslint.validate": [
+    "javascriptreact",
+    {
+      "language": "typescript",
+      "autoFix": true
+    },
+    {
+      "language": "typescriptreact",
+      "autoFix": true
+    },
+    {
+      "language": "javascript",
+      "autoFix": true
+    },
+  ],
+  "blueprint.templatesPath": [
+    "./.blueprints"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
