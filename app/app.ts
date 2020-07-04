@@ -1,4 +1,5 @@
 import express from "express";
+import deployments from "routes/deployments";
 
 const app = express();
 
@@ -11,6 +12,8 @@ app.get("/", (req, res) => {
 app.get("/stat", (req, res) => {
   res.send("Healthy");
 });
+
+app.use("/deployments", deployments);
 
 app.listen(APP_PORT, () => {
   console.log(`Server is listening on port: ${APP_PORT}`);
