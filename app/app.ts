@@ -1,6 +1,7 @@
 import express from "express";
 import deployments from "./routes/deployments";
-import { connectMongo } from "./config/mongo";
+import { mongoUri, mongoConfig } from "./config/mongo";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.get("/stat", (req, res) => {
 
 app.use("/deployments", deployments);
 
-connectMongo().then(() => {
+mongoose.connect(mongoUri, mongoConfig, () => {
   app.listen(APP_PORT, () => {
     console.log(`Server is listening on port: ${APP_PORT}`);
   });
