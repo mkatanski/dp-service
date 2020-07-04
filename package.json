@@ -13,10 +13,16 @@
     "reinstall": "rm -rf node_modules && yarn install --frozen-lockfile",
     "reinstall:cache": "rm -rf node_modules && yarn cache clean && yarn install --frozen-lockfile",
     "reinstall:regenerate-lock": "rm -rf node_modules && yarn cache clean && rm -rf yarn.lock && yarn install",
-    "pretty": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "lint": "eslint --config ./.eslintrc --format table 'src/**/*.{ts,tsx}' && tsc --noEmit",
+    "pretty": "prettier --write \"app/**/*.ts\"",
+    "lint": "eslint --config ./.eslintrc --format table 'app/**/*.ts' && tsc --noEmit",
     "docker:start": "docker build -t dp-service . && docker run -td -p8080:8080 dp-service",
     "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=dp-service --format=\"{{.ID}}\"))"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --bail --no-restage && yarn run lint",
+      "pre-push": "yarn run lint"
+    }
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.5.0",
