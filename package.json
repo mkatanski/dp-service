@@ -1,0 +1,22 @@
+{
+  "name": "dp-service",
+  "version": "1.0.0",
+  "description": "Deployment Prototype Service",
+  "main": "dist/app.js",
+  "author": "Michal Katanski",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "ts-node ./app/app.ts",
+    "build": "tsc --project tsconfig.json",
+    "run": "node dist/app.js"
+  },
+  "devDependencies": {
+    "ts-node": "^8.10.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.6",
+    "typescript": "^3.9.6",
+    "express": "^4.17.1"
+  }
+}
