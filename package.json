@@ -9,7 +9,9 @@
   "scripts": {
     "start": "ts-node ./app/app.ts",
     "build": "tsc --project tsconfig.json",
-    "run": "node dist/app.js"
+    "run": "node dist/app.js",
+    "docker:start": "docker build -t dp-service . && docker run -td -p8080:8080 dp-service",
+    "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=dp-service --format=\"{{.ID}}\"))"
   },
   "devDependencies": {
     "ts-node": "^8.10.2"
