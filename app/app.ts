@@ -1,5 +1,6 @@
 import express from "express";
 import deployments from "./routes/deployments";
+import { connectMongo } from "./config/mongo";
 
 const app = express();
 
@@ -15,8 +16,10 @@ app.get("/stat", (req, res) => {
 
 app.use("/deployments", deployments);
 
-app.listen(APP_PORT, () => {
-  console.log(`Server is listening on port: ${APP_PORT}`);
+connectMongo().then(() => {
+  app.listen(APP_PORT, () => {
+    console.log(`Server is listening on port: ${APP_PORT}`);
+  });
 });
 
 export default app;
