@@ -1,5 +1,5 @@
 import express from "express";
-import * as DeploymentsController from "controllers/DeploymentsController";
+import * as DeploymentsController from "../controllers/DeploymentsController";
 
 const deploymentsRoute = express.Router();
 

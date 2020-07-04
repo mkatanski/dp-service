@@ -1,5 +1,5 @@
 import express from "express";
-import deployments from "routes/deployments";
+import deployments from "./routes/deployments";
 
 const app = express();
 

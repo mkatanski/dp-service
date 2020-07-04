@@ -6,8 +6,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "sourceRoot": "app",
-    "baseUrl": "app"
+    "sourceRoot": "app"
   },
-  "lib": ["es2015"]
+  "lib": ["es2015"],
+  "include": ["app"]
 }
