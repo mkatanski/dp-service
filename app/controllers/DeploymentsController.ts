@@ -23,7 +23,7 @@ export const getDeployments: RequestHandler = async (req, res) => {
 };
 
 export const addDeployment: RequestHandler<
-  never,
+  Record<string, string>,
   ResponseBodySingle<IDeployment>,
   Partial<IDeployment>
 > = async (req, res) => {
