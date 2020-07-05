@@ -9,6 +9,7 @@ jest.mock("../../models/deployment", () => ({
 
 interface ModelMock extends jest.Mock {
   find: jest.Mock;
+  deleteOne: jest.Mock;
 }
 
 const DeploymentModelMock = (DeploymentModel as unknown) as ModelMock;
@@ -240,16 +241,41 @@ describe("DeploymentsController", () => {
   });
 
   describe("deleteDeployment", () => {
-    it("should return correct value", () => {
-      const jsonMock = jest.fn();
-      DeploymentsController.deleteDeployment(
-        ({ params: { id: "test_id" } } as unknown) as Request,
-        ({ json: jsonMock } as unknown) as Response,
+    it("should return correct value", async () => {
+      DeploymentModelMock.deleteOne = jest.fn((conditions, cb) => {
+        cb(null, conditions);
+      });
+
+      await DeploymentsController.deleteDeployment(
+        makeRequestObj({
+          params: { id: "test_id" }
+        }),
+        makeResponseObj(),
         jest.fn()
       );
 
       expect(jsonMock).toHaveBeenCalledTimes(1);
-      expect(jsonMock).toHaveBeenCalledWith({ param: "test_id", status: "OK" });
+      expect(jsonMock).toHaveBeenCalledWith({ _id: "test_id" });
+    });
+
+    it("should return failure", async () => {
+      DeploymentModelMock.deleteOne = jest.fn((conditions, cb) => {
+        cb({ message: "something went wrong" }, conditions);
+      });
+
+      await DeploymentsController.deleteDeployment(
+        makeRequestObj({
+          params: { id: "test_id" }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(jsonMock).toHaveBeenCalledTimes(1);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "something went wrong",
+        status: "FAILED"
+      });
     });
   });
 });

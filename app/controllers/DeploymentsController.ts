@@ -64,6 +64,13 @@ export const addDeployment: RequestHandler<
   }
 };
 
-export const deleteDeployment: RequestHandler = (req, res) => {
-  res.json({ status: "OK", param: req.params["id"] });
+export const deleteDeployment: RequestHandler = async (req, res) => {
+  const deleteOne = promisify(DeploymentModel.deleteOne.bind(DeploymentModel));
+
+  try {
+    const operationSummary = await deleteOne({ _id: req.params.id });
+    res.json(operationSummary);
+  } catch (e) {
+    res.status(500).json({ status: "FAILED", message: e.message });
+  }
 };
