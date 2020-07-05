@@ -5,17 +5,35 @@ import {
   IDeployment,
   IDeploymentDocument
 } from "../models/deployment";
-import { promisify } from "util";
 import { validate } from "../utils/validate";
 
-export const getDeployments: RequestHandler = async (req, res) => {
-  const find = promisify<IDeploymentDocument[]>(
-    DeploymentModel.find.bind(DeploymentModel)
-  );
+export const getDeployments: RequestHandler<
+  Record<string, string>,
+  ResponseBodyList<IDeploymentDocument>,
+  null,
+  ListBasicQuery
+> = async (req, res) => {
+  const limit =
+    Number.isNaN(req.query.limit) || !req.query.limit
+      ? 10
+      : Number(req.query.limit);
+  const skip =
+    Number.isNaN(req.query.offset) || !req.query.offset
+      ? 0
+      : Number(req.query.offset);
+
+  const query = DeploymentModel.find({}, null, { limit, skip });
 
   try {
-    const docs = await find();
-    res.json({ items: docs });
+    const total = await DeploymentModel.countDocuments().exec();
+    const docs = await query.exec();
+    res.json({
+      status: "OK",
+      items: docs,
+      totalCount: total,
+      limit,
+      offset: skip
+    });
   } catch (e) {
     res.status(500).json({ status: "FAILED", message: e.message });
   }
@@ -59,10 +77,10 @@ export const addDeployment: RequestHandler<
 };
 
 export const deleteDeployment: RequestHandler = async (req, res) => {
-  const deleteOne = promisify(DeploymentModel.deleteOne.bind(DeploymentModel));
+  const query = DeploymentModel.deleteOne({ _id: req.params.id });
 
   try {
-    const operationSummary = await deleteOne({ _id: req.params.id });
+    const operationSummary = await query.exec();
     res.json(operationSummary);
   } catch (e) {
     res.status(500).json({ status: "FAILED", message: e.message });

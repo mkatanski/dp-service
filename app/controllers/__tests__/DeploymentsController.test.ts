@@ -27,6 +27,7 @@ describe("DeploymentsController", () => {
   }: {
     body?: Record<string, string>;
     params?: Record<string, string>;
+    query?: Record<string, string>;
   }): Request =>
     (({
       body,
