@@ -58,6 +58,24 @@ describe("DeploymentsController", () => {
         }
       });
     });
+
+    it("should return failure message", async () => {
+      DeploymentModelMock.find = jest.fn(cb => {
+        cb({ message: "something went wrong" }, { test: "test" });
+      });
+
+      await DeploymentsController.getDeployments(
+        makeRequestObj({}),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(jsonMock).toHaveBeenCalledTimes(1);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "something went wrong",
+        status: "FAILED"
+      });
+    });
   });
 
   describe("addDeployment", () => {
@@ -84,6 +102,114 @@ describe("DeploymentsController", () => {
       expect(jsonMock).toHaveBeenCalledWith({
         item: { insertedElementData: true },
         status: "OK"
+      });
+    });
+
+    it("should return invalid url message", async () => {
+      DeploymentModelMock.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue({
+          insertedElementData: true
+        })
+      }));
+
+      await DeploymentsController.addDeployment(
+        makeRequestObj({
+          body: {
+            url: "mkatanski.",
+            templateName: "SuperDuper",
+            version: "1.0.0",
+            deployedAt: "2016-07-08T12:30:00Z"
+          }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "url property has to be valid url",
+        status: "FAILED"
+      });
+    });
+
+    it("should return invalid version message", async () => {
+      DeploymentModelMock.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue({
+          insertedElementData: true
+        })
+      }));
+
+      await DeploymentsController.addDeployment(
+        makeRequestObj({
+          body: {
+            url: "mkatanski.com",
+            templateName: "SuperDuper",
+            version: "1.0.0.",
+            deployedAt: "2016-07-08T12:30:00Z"
+          }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "version has to be in SemVer format",
+        status: "FAILED"
+      });
+    });
+
+    it("should return invalid deployAt message", async () => {
+      DeploymentModelMock.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue({
+          insertedElementData: true
+        })
+      }));
+
+      await DeploymentsController.addDeployment(
+        makeRequestObj({
+          body: {
+            url: "mkatanski.com",
+            templateName: "SuperDuper",
+            version: "1.0.0",
+            deployedAt: "2016-07-08T12:30:60Z"
+          }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "deployedAt must be valid ISO-8601 UTC time format",
+        status: "FAILED"
+      });
+    });
+
+    it("should return invalid templateName message", async () => {
+      DeploymentModelMock.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue({
+          insertedElementData: true
+        })
+      }));
+
+      await DeploymentsController.addDeployment(
+        makeRequestObj({
+          body: {
+            url: "mkatanski.com",
+            templateName: "SuperDuper1",
+            version: "1.0.0",
+            deployedAt: "2016-07-08T12:30:56Z"
+          }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "templateName must contain only alpha characters",
+        status: "FAILED"
       });
     });
   });
