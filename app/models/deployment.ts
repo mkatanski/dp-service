@@ -28,6 +28,6 @@ export const deploymentSchema = new mongoose.Schema({
   }
 });
 
-export const deploymentModel: Model<IDeploymentDocument> = mongoose.model<
+export const DeploymentModel: Model<IDeploymentDocument> = mongoose.model<
   IDeploymentDocument
 >("deployment", deploymentSchema);

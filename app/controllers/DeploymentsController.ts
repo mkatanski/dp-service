@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import validator from "validator";
 import {
-  deploymentModel,
+  DeploymentModel,
   IDeployment,
   IDeploymentDocument
 } from "../models/deployment";
@@ -11,7 +11,7 @@ import { isIso8601 } from "../utils/validators";
 
 export const getDeployments: RequestHandler = async (req, res) => {
   const find = promisify<IDeploymentDocument[]>(
-    deploymentModel.find.bind(deploymentModel)
+    DeploymentModel.find.bind(DeploymentModel)
   );
 
   try {
@@ -49,7 +49,7 @@ export const addDeployment: RequestHandler<
     return;
   }
 
-  const deployment = new deploymentModel({
+  const deployment = new DeploymentModel({
     url: req.body.url,
     templateName: req.body.templateName,
     version: req.body.version,
