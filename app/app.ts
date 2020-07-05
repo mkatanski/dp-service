@@ -1,11 +1,14 @@
 import express from "express";
 import deployments from "./routes/deployments";
+
 import { mongoUri, mongoConfig } from "./config/mongo";
 import mongoose from "mongoose";
 
 const app = express();
 
 const APP_PORT = process.env.PORT || 8080;
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Healthy");

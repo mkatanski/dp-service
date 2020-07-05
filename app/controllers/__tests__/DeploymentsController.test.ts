@@ -20,7 +20,7 @@ describe("DeploymentsController", () => {
     it("should return correct value", () => {
       const jsonMock = jest.fn();
       DeploymentsController.addDeployment(
-        ({ params: { id: "test_id" } } as unknown) as Request,
+        null,
         ({ json: jsonMock } as unknown) as Response,
         jest.fn()
       );

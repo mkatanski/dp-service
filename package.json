@@ -65,10 +65,12 @@
   "dependencies": {
     "@types/express": "^4.17.6",
     "@types/mongoose": "^5.7.29",
+    "@types/validator": "^13.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.21",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "validator": "^13.1.1"
   }
 }

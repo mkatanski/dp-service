@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "sourceRoot": "app"
+    "sourceRoot": "app",
+    "typeRoots": ["./app/types", "node_modules/@types"]
   },
   "lib": ["es2015"],
   "include": ["app"]
