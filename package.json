@@ -17,7 +17,7 @@
     "reinstall:regenerate-lock": "rm -rf node_modules && yarn cache clean && rm -rf yarn.lock && yarn install",
     "pretty": "prettier --write \"app/**/*.ts\"",
     "lint": "eslint --config ./.eslintrc --format table 'app/**/*.ts' && tsc --noEmit",
-    "docker:start": "docker build -t dp-service . && docker run -td -p8080:8080 dp-service",
+    "docker:start": "docker build -t dp-service . && docker run -td -p8080:8080 --env-file ./.env dp-service",
     "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=dp-service --format=\"{{.ID}}\"))"
   },
   "husky": {
