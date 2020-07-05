@@ -4,7 +4,7 @@ export interface IDeployment {
   url: string;
   templateName: string;
   version: string;
-  deployedAt: string;
+  deployedAt: Date;
 }
 
 export interface IDeploymentDocument extends Document, IDeployment {}
@@ -23,7 +23,7 @@ export const deploymentSchema = new mongoose.Schema({
     required: true
   },
   deployedAt: {
-    type: String,
+    type: Date,
     required: true
   }
 });

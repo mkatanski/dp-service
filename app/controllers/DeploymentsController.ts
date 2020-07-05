@@ -7,7 +7,6 @@ import {
 } from "../models/deployment";
 import { promisify } from "util";
 import { validate } from "../utils/validate";
-import { isIso8601 } from "../utils/validators";
 
 export const getDeployments: RequestHandler = async (req, res) => {
   const find = promisify<IDeploymentDocument[]>(
@@ -25,7 +24,7 @@ export const getDeployments: RequestHandler = async (req, res) => {
 export const addDeployment: RequestHandler<
   Record<string, string>,
   ResponseBodySingle<IDeployment>,
-  Partial<IDeployment>
+  Partial<Omit<IDeployment, "deployedAt">>
 > = async (req, res) => {
   try {
     validate(
@@ -34,11 +33,6 @@ export const addDeployment: RequestHandler<
     )(req.body.version);
 
     validate(validator.isURL, "url property has to be valid url")(req.body.url);
-
-    validate(
-      isIso8601,
-      "deployedAt must be valid ISO-8601 UTC time format"
-    )(req.body.deployedAt);
 
     validate(
       validator.isAlpha,
@@ -53,7 +47,7 @@ export const addDeployment: RequestHandler<
     url: req.body.url,
     templateName: req.body.templateName,
     version: req.body.version,
-    deployedAt: req.body.deployedAt
+    deployedAt: new Date()
   });
 
   try {
