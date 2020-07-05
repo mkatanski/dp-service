@@ -105,6 +105,31 @@ describe("DeploymentsController", () => {
       });
     });
 
+    it("should return correct value", async () => {
+      DeploymentModelMock.mockImplementation(() => ({
+        save: jest.fn().mockRejectedValue({ message: "something went wrong" })
+      }));
+
+      await DeploymentsController.addDeployment(
+        makeRequestObj({
+          body: {
+            url: "http://mkatanski.com",
+            templateName: "SuperDuper",
+            version: "1.0.0",
+            deployedAt: "2016-07-08T12:30:00Z"
+          }
+        }),
+        makeResponseObj(),
+        jest.fn()
+      );
+
+      expect(statusMock).toHaveBeenCalledWith(500);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "something went wrong",
+        status: "FAILED"
+      });
+    });
+
     it("should return invalid url message", async () => {
       DeploymentModelMock.mockImplementation(() => ({
         save: jest.fn().mockResolvedValue({
