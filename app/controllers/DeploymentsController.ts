@@ -26,7 +26,7 @@ export const getDeployments: RequestHandler<
 
   try {
     const total = await DeploymentModel.countDocuments().exec();
-    const docs = await query.exec();
+    const docs = await query.sort("-deployedAt").exec();
     res.json({
       status: "OK",
       items: docs,
