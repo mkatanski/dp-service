@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import deployments from "./routes/deployments";
 
 import { mongoUri, mongoConfig } from "./config/mongo";
@@ -9,6 +10,7 @@ const app = express();
 const APP_PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Healthy");
