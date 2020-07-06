@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import deployments from "./routes/deployments";
+import templates from "./routes/templates";
 
 import { mongoUri, mongoConfig } from "./config/mongo";
 import mongoose from "mongoose";
@@ -21,6 +22,7 @@ app.get("/stat", (req, res) => {
 });
 
 app.use("/deployments", deployments);
+app.use("/templates", templates);
 
 mongoose.connect(mongoUri, mongoConfig, () => {
   app.listen(APP_PORT, () => {
