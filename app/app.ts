@@ -21,8 +21,8 @@ app.get("/stat", (req, res) => {
   res.send("Healthy");
 });
 
-app.use("/deployments", deployments);
-app.use("/templates", templates);
+app.use("/api/deployments", deployments);
+app.use("/api/templates", templates);
 
 mongoose.connect(mongoUri, mongoConfig, () => {
   app.listen(APP_PORT, () => {
