@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Healthy");
+  res.send("Healthy!");
 });
 
 app.get("/stat", (req, res) => {

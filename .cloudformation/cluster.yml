@@ -5,9 +5,21 @@ Parameters:
     Type: String
   SubnetID2:
     Type: String
+  DockerImage:
+    Type: String
+    Default: 870041043679.dkr.ecr.eu-west-2.amazonaws.com/template-deploy-repo:latest
+  ContainerName:
+    Type: String
+    Default: td-service
   VpcID:
     Type: String
     Default: vpc-0316ef6a
+  EnvMongoDatabase:
+    Type: String
+  EnvMongoPwd:
+    Type: String
+  EnvMongoUser:
+    Type: String
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster

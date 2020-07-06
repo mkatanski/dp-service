@@ -1,5 +1,5 @@
 {
-  "name": "dp-service",
+  "name": "td-service",
   "version": "1.0.0",
   "description": "Deployment Prototype Service",
   "main": "dist/app.js",
@@ -17,8 +17,19 @@
     "reinstall:regenerate-lock": "rm -rf node_modules && yarn cache clean && rm -rf yarn.lock && yarn install",
     "pretty": "prettier --write \"app/**/*.ts\"",
     "lint": "eslint --config ./.eslintrc --format table 'app/**/*.ts' && tsc --noEmit",
-    "docker:start": "docker build -t dp-service . && docker run -td -p8080:8080 --env-file ./.env dp-service",
-    "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=dp-service --format=\"{{.ID}}\"))"
+    "docker:start": "docker build -t td-service . && docker run -td -p8080:8080 --env-file ./.env td-service",
+    "docker:stop": "docker rm $(docker stop $(docker ps -a -q --filter ancestor=td-service --format=\"{{.ID}}\"))",
+    "docker:build:push": "yarn build && docker build -t 870041043679.dkr.ecr.eu-west-2.amazonaws.com/template-deploy-repo:latest . && docker push 870041043679.dkr.ecr.eu-west-2.amazonaws.com/template-deploy-repo:latest",
+    "docker:login:aws": "aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 870041043679.dkr.ecr.eu-west-2.amazonaws.com",
+    "cloud:cs:iam": "aws cloudformation create-stack --stack-name template-deploy-iam --template-body file://./.cloudformation/iam.yml --capabilities CAPABILITY_NAMED_IAM",
+    "cloud:cs:cluster": "aws cloudformation create-stack --stack-name template-deploy-cluster --template-body file://./.cloudformation/cluster.yml --capabilities CAPABILITY_NAMED_IAM --parameters file://./cloudformation_params.json",
+    "cloud:cs:api": "aws cloudformation create-stack --stack-name template-deploy-api --template-body file://./.cloudformation/api.yml --capabilities CAPABILITY_NAMED_IAM --parameters file://./cloudformation_params.json",
+    "cloud:us:iam": "aws cloudformation update-stack --stack-name template-deploy-iam --template-body file://./.cloudformation/iam.yml --capabilities CAPABILITY_NAMED_IAM",
+    "cloud:us:cluster": "aws cloudformation update-stack --stack-name template-deploy-cluster --template-body file://./.cloudformation/cluster.yml --capabilities CAPABILITY_NAMED_IAM --parameters file://./cloudformation_params.json",
+    "cloud:us:api": "aws cloudformation update-stack --stack-name template-deploy-api --template-body file://./.cloudformation/api.yml --capabilities CAPABILITY_NAMED_IAM --parameters file://./cloudformation_params.json",
+    "cloud:ds:iam": "aws cloudformation delete-stack --stack-name template-deploy-iam",
+    "cloud:ds:cluster": "aws cloudformation delete-stack --stack-name template-deploy-cluster",
+    "cloud:ds:api": "aws cloudformation delete-stack --stack-name template-deploy-api"
   },
   "husky": {
     "hooks": {

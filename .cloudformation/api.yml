@@ -7,18 +7,18 @@ Parameters:
     Type: String
   DockerImage:
     Type: String
-    Default: 870041043679.dkr.ecr.eu-west-2.amazonaws.com/td-service:latest
+    Default: 870041043679.dkr.ecr.eu-west-2.amazonaws.com/template-deploy-repo:latest
   ContainerName:
     Type: String
     Default: td-service
   VpcID:
     Type: String
     Default: vpc-0316ef6a
-  ENV_MONGO_DATABASE:
+  EnvMongoDatabase:
     Type: String
-  ENV_MONGO_USER_PWD:
+  EnvMongoPwd:
     Type: String
-  ENV_MONGO_USER_NAME:
+  EnvMongoUser:
     Type: String
 Resources:
   Task:
@@ -38,18 +38,18 @@ Resources:
           Memory: 512
           Environment:
             - Name: MONGO_USER_PWD
-              Value: !Ref ENV_MONGO_USER_PWD
+              Value: !Ref EnvMongoPwd
             - Name: MONGO_USER_NAME
-              Value: !Ref ENV_MONGO_USER_NAME
+              Value: !Ref EnvMongoUser
             - Name: MONGO_DATABASE
-              Value: !Ref ENV_MONGO_DATABASE
+              Value: !Ref EnvMongoDatabase
           PortMappings:
             - ContainerPort: 8080
               Protocol: tcp
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: template-deployment-service
+              awslogs-group: apis
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: test-deploy
 
@@ -61,10 +61,13 @@ Resources:
       TaskDefinition: !Ref Task
       Cluster: !ImportValue TemplateDeployCluster
       LaunchType: FARGATE
-      DesiredCount: 1
+      DesiredCount: 2
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 70
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          AssignPublicIp: ENABLED
           Subnets:
             - !Ref SubnetID1
             - !Ref SubnetID2
