@@ -14,6 +14,12 @@ Parameters:
   VpcID:
     Type: String
     Default: vpc-0316ef6a
+  ENV_MONGO_DATABASE:
+    Type: String
+  ENV_MONGO_USER_PWD:
+    Type: String
+  ENV_MONGO_USER_NAME:
+    Type: String
 Resources:
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -30,6 +36,13 @@ Resources:
           Image: !Ref DockerImage
           Cpu: 256
           Memory: 512
+          Environment:
+            - Name: MONGO_USER_PWD
+              Value: !Ref ENV_MONGO_USER_PWD
+            - Name: MONGO_USER_NAME
+              Value: !Ref ENV_MONGO_USER_NAME
+            - Name: MONGO_DATABASE
+              Value: !Ref ENV_MONGO_DATABASE
           PortMappings:
             - ContainerPort: 8080
               Protocol: tcp
