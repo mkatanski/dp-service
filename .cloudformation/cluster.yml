@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: API Cluster configuration
+Parameters:
+  SubnetID1:
+    Type: String
+  SubnetID2:
+    Type: String
+  VpcID:
+    Type: String
+    Default: vpc-0316ef6a
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: templatedeploy-cluster
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: templatedeploy-loadbalancer
+      Subnets:
+        - !Ref SubnetID1
+        - !Ref SubnetID2
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref DefaultTargetGroup
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for template-deploy loadbalance
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+  DefaultTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: templatedeploy-default-target
+      VpcId: !Ref VpcID
+      Protocol: "HTTP"
+      Port: "80"
+
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "apis"
+      RetentionInDays: 1
+
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcID
+      GroupDescription: for template-deploy ecs containers
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+          IpProtocol: -1
+
+  Domain:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: mkatanski.com.
+      Comment: Alias to loadbalancer
+      RecordSets:
+        - Name: deployapi.mkatanski.com.
+          Type: A
+          AliasTarget:
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
+
+Outputs:
+  Cluster:
+    Value: !Ref ECSCluster
+    Export:
+      Name: TemplateDeployCluster
+
+  Listener:
+    Description: port 80
+    Value: !Ref LoadBalancerListener
+    Export:
+      Name: TemplateDeployListener
+
+  ContainerSecurityGroup:
+    Value: !Ref ContainerSecurityGroup
+    Export:
+      Name: TemplateDeployContainerSecurityGroup
+
+  LoadBalancerDNS:
+    Description: Domain name for the loadbalancer
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: TemplateDeployDomainName

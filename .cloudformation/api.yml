@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: API configuration
+Parameters:
+  SubnetID1:
+    Type: String
+  SubnetID2:
+    Type: String
+  DockerImage:
+    Type: String
+    Default: 870041043679.dkr.ecr.eu-west-2.amazonaws.com/td-service:latest
+  ContainerName:
+    Type: String
+    Default: td-service
+  VpcID:
+    Type: String
+    Default: vpc-0316ef6a
+Resources:
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: apis
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name: !Ref ContainerName
+          Image: !Ref DockerImage
+          Cpu: 256
+          Memory: 512
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: template-deployment-service
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: test-deploy
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: ListenerRule
+    Properties:
+      ServiceName: template-deployment-service
+      TaskDefinition: !Ref Task
+      Cluster: !ImportValue TemplateDeployCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID1
+            - !Ref SubnetID2
+          SecurityGroups:
+            - !ImportValue TemplateDeployContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: !Ref ContainerName
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: td-service-tg
+      VpcId: !Ref VpcID
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200-299
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /stat
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 10
+      TargetType: ip
+
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !ImportValue TemplateDeployListener
+      Priority: 2
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /api*
+      Actions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+
+Outputs:
+  AwsApiEndpoint:
+    Description: AWS Template Deployment API Endpoint
+    Value:
+      !Join ["", ["http://", !ImportValue TemplateDeployDomainName, "/api"]]
+    Export:
+      Name: AwsApiEndpoint
