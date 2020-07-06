@@ -1,10 +1,8 @@
 import mongoose, { Model, Document } from "mongoose";
 
 export interface ITemplate {
-  url: string;
-  templateName: string;
-  version: string;
-  deployedAt: Date;
+  name: string;
+  versions: string[];
 }
 
 export interface ITemplateDocument extends Document, ITemplate {}

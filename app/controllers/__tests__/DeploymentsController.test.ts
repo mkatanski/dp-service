@@ -2,18 +2,25 @@ import * as DeploymentsController from "../DeploymentsController";
 import { Request, Response } from "express";
 
 import { DeploymentModel } from "../../models/deployment";
+import { TemplateModel } from "../../models/template";
 
 jest.mock("../../models/deployment", () => ({
   DeploymentModel: jest.fn()
 }));
 
+jest.mock("../../models/template", () => ({
+  TemplateModel: jest.fn()
+}));
+
 interface ModelMock extends jest.Mock {
   find: jest.Mock;
+  findOne: jest.Mock;
   countDocuments: jest.Mock;
   deleteOne: jest.Mock;
 }
 
 const DeploymentModelMock = (DeploymentModel as unknown) as ModelMock;
+const TemplateModelMock = (TemplateModel as unknown) as ModelMock;
 
 describe("DeploymentsController", () => {
   let jsonMock: jest.Mock;
@@ -95,6 +102,12 @@ describe("DeploymentsController", () => {
   });
 
   describe("addDeployment", () => {
+    beforeEach(() => {
+      TemplateModelMock.findOne = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue({ found: true })
+      });
+    });
+
     it("should return correct value", async () => {
       DeploymentModelMock.mockImplementation(() => ({
         save: jest.fn().mockResolvedValue({
@@ -200,7 +213,11 @@ describe("DeploymentsController", () => {
       });
     });
 
-    it("should return invalid templateName message", async () => {
+    it("should return invalid template message", async () => {
+      TemplateModelMock.findOne = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(undefined)
+      });
+
       DeploymentModelMock.mockImplementation(() => ({
         save: jest.fn().mockResolvedValue({
           insertedElementData: true
@@ -211,9 +228,9 @@ describe("DeploymentsController", () => {
         makeRequestObj({
           body: {
             url: "mkatanski.com",
-            templateName: "SuperDuper1",
+            templateName: "SuperDuper",
             version: "1.0.0",
-            deployedAt: "2016-07-08T12:30:56Z"
+            deployedAt: "2016-07-08T12:30:00Z"
           }
         }),
         makeResponseObj(),
@@ -222,7 +239,7 @@ describe("DeploymentsController", () => {
 
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
-        message: "templateName must contain only alpha characters",
+        message: "template not found",
         status: "FAILED"
       });
     });

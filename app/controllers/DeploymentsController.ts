@@ -6,6 +6,7 @@ import {
   IDeploymentDocument
 } from "../models/deployment";
 import { validate } from "../utils/validate";
+import { TemplateModel } from "../models/template";
 
 export const getDeployments: RequestHandler<
   Record<string, string>,
@@ -49,13 +50,15 @@ export const addDeployment: RequestHandler<
       validator.isSemVer,
       "version has to be in SemVer format"
     )(req.body.version);
-
     validate(validator.isURL, "url property has to be valid url")(req.body.url);
 
-    validate(
-      validator.isAlpha,
-      "templateName must contain only alpha characters"
-    )(req.body.templateName);
+    const template = await TemplateModel.findOne({
+      name: req.body.templateName
+    }).exec();
+
+    if (!template) {
+      throw new Error("template not found");
+    }
   } catch (e) {
     res.status(400).json({ status: "FAILED", message: e.message });
     return;
